@@ -1,0 +1,74 @@
+{
+  "tools": [
+    {
+      "name": "stickerwindow_list",
+      "description": "列出表情包目录里可用的图,按修改时间从新到旧。给 stickwindow_show 的 file 用。",
+      "parameters": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "limit": {
+            "type": "integer",
+            "description": "最多列几张,1 到 50,默认 20。"
+          }
+        },
+        "required": []
+      },
+      "tags": [
+        "read"
+      ]
+    },
+    {
+      "name": "stickerwindow_show",
+      "description": "在桌面上单独弹一个表情包气泡(不是桌宠的说话气泡)。位置由 where 决定,几秒后自己消失。",
+      "parameters": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "file": {
+            "type": "string",
+            "description": "表情包文件名,取自 stickwindow_list。"
+          },
+          "where": {
+            "type": "object",
+            "description": "放哪里:不填是屏幕底部正中(桌宠常在底边走)。也可给 cursor(鼠标旁)、bottom-left、bottom-right、center、top-left、top-right,或 { x, y } 归一化坐标(0–1)。",
+            "additionalProperties": false,
+            "properties": {
+              "mode": {
+                "type": "string",
+                "description": "预设名,如 cursor、bottom-right。"
+              },
+              "x": {
+                "type": "number",
+                "description": "归一化横坐标,0 最左、1 最右。"
+              },
+              "y": {
+                "type": "number",
+                "description": "归一化纵坐标,0 最上、1 最下。"
+              }
+            }
+          }
+        },
+        "required": [
+          "file"
+        ]
+      },
+      "tags": [
+        "act"
+      ],
+      "summary": {
+        "zh": "在桌面上单独弹一个表情包气泡,位置可选。",
+        "en": "Shows a sticker in its own bubble on the desktop, at a chosen position."
+      }
+    }
+  ],
+  "events": [],
+  "prompts": [
+    {
+      "key": "worlds.stickerwindow.envPrompt",
+      "title": "表情窗户 · 环境提示词",
+      "role": "envPrompt",
+      "content": "## 表情窗户\n\n`stickerwindow_show` 在桌面上单独弹一个表情包气泡,不占桌宠的说话气泡。它只做一件事:显示一张图,几秒后自己消失;要说话仍用 `pet_say`。\n\n- 图从 `{{stickerwindow.sourceDir}}` 里取,现在有 `{{stickerwindow.count}}` 张;用 `stickerwindow_list` 看文件名。\n- **每次都要自己挑位置**,不要交给默认值。按对方的屏幕和当下情境选一个:\n  - `cursor`:跟着对方此刻的鼠标,像随手递过去\n  - `bottom-right` / `bottom-left`:角落,不挡画面中间\n  - `center`:屏幕正中,适合想强调的时候\n  - `{ x, y }` 归一化坐标:想精确放哪就放哪(0 最左/最上,1 最右/最下)\n- 回执会写清你把它放在哪了;回话时顺口说一声,例如「图放右下角了」「贴你鼠标边上了」。\n- 边框`{{stickerwindow.border}}`;开着时图片套一层聊天气泡,关着时只有图。\n- 对方在忙、在说正事、情绪低落时不要弹;图是语气,不是内容。同一条回复最多一张。\n\n### 想让气泡贴着自己\n\n你读不到自己此刻站在屏幕哪里(随机走动会让位置变),但你知道自己要去哪。想贴身时,用同一个横向位置两步走:\n\n1. `stickerwindow_show({ file: \"…\", where: { x: 0.3, y: 0.74 } })`\n2. `pet_move_to({ to: 0.3 })`\n\n反过来也行:先 `pet_move_to` 到某处,再按同一个 `to` 值放气泡。\n\n不追求贴身时不用这两步,直接挑一个不挡事的位置就行。\n"
+    }
+  ]
+}
