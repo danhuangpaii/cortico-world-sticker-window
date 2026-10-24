@@ -1,6 +1,6 @@
 {
   "name": "cortico-world-sticker-window",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "type": "module",
   "description": "可以让你的桌宠在桌面上弹表情包",
   "license": "MIT",
@@ -9,7 +9,11 @@
     "cortico",
     "sticker",
     "bubble",
-    "desktop"
+    "desktop",
+    "表情窗户",
+    "表情",
+    "表情包",
+    "桌宠"
   ],
   "engines": {
     "node": ">=22"

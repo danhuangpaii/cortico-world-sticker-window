@@ -3,7 +3,7 @@ import { fileURLToPath } from 'node:url';
 import { spawnSync } from 'node:child_process';
 import { existsSync, statSync } from 'node:fs';
 import { join } from 'node:path';
-import type { ToolDef, World, WorldWebUiDecl, WorldHost } from 'cortico/core/types.ts';
+import type { ToolDef, World, WorldHost, WorldLamp, WorldWebUiDecl } from 'cortico/core/types.ts';
 import { STICKERWINDOW_CONFIG_GROUP, type StickerWindowConfigSection } from './config.ts';
 import { parseWhere, type CursorPoint, type Where } from './position.ts';
 import { listStickers, resolveSticker, showBubbleWindow, toDataUrl, type WindowHandle } from './window.ts';
@@ -80,6 +80,8 @@ export class StickerWindowWorld implements World {
 
   webUi(): WorldWebUiDecl {
     return {
+      label: '表情窗户',
+      lamps: [this.lamp()],
       config: [STICKERWINDOW_CONFIG_GROUP],
       promptDocs: [
         {
@@ -112,6 +114,20 @@ export class StickerWindowWorld implements World {
   private sourceDir(): string {
     const configured = this.opts.cfg.sourceDir.trim();
     return configured || join(this.opts.dataDir, 'emoji');
+  }
+
+  /** 状态灯:图库读不读得到、有多少张。 */
+  private lamp(): WorldLamp {
+    const dir = this.sourceDir();
+    if (!existsSync(dir)) {
+      return { label: '图库', state: 'error', hint: `目录不存在,读不到图:${dir}` };
+    }
+    const count = listStickers(dir, 500).length;
+    return {
+      label: '图库',
+      state: count > 0 ? 'online' : 'offline',
+      hint: count > 0 ? `${count} 张图\n${dir}` : `目录是空的:${dir}`,
+    };
   }
 
   private listTool(): ToolDef {
